@@ -1,4 +1,4 @@
-<p align="center"> <img src="https://github.com/sun0day/chrome-extension-helper/assets/102238922/7a8fb93f-e175-40e8-a530-76ffb3837676"/></p>
+<p align="center"> <img src="https://github.com/sun0day/chrome-extension-helper/assets/102238922/0c2ed01f-687f-4f8a-939f-8ecedbfb5a59"/></p>
 
 # chrome-extension-helper
 
@@ -13,3 +13,4 @@ This mono repo aims to improve the Chrome extension DX for developers. It provid
 - :hammer: Strict Eslint rules for native APIs
 
 ## 🦄 Usages
+
