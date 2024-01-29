@@ -1,8 +1,8 @@
 <p align="center"> <img src="https://github.com/sun0day/chrome-extension-helper/assets/102238922/0c2ed01f-687f-4f8a-939f-8ecedbfb5a59"/></p>
 
-# chrome-extension-helper
+# happy-chrome-extension
 
-This mono repo aims to improve the Chrome extension DX for developers. It provides rich features to help you quickly build a new robust Chrome extension app. You can also pick some of the `chrome-extension-helper` packages to enhance an existing Chrome extension. 
+This mono repo aims to improve the Chrome extension DX for developers. It provides rich features to help you quickly build a new robust Chrome extension app. You can also pick some of the `happy-chrome-extension` packages to enhance an existing Chrome extension. 
 
 ## 🚀 Features
 
