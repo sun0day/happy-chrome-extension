@@ -7,7 +7,7 @@ This mono repo aims to improve the Chrome extension DX for developers. It provid
 ## 🚀 Features
 
 - :herb: Lite project boilerplate based on Vite
-- 🐎 Straightforward semantic APIs
+- 🐎 Simple APIs for complex scenarios
 - 🐳 Smooth extension HMR
 - :electric_plug: Easy integration with React and Vue
 - :hammer: Strict Eslint rules for native APIs
