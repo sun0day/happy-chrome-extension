@@ -1,6 +1,6 @@
+import {readFileSync, writeFileSync} from 'node:fs'
 import {access,constants,mkdir, rm as nativeRm, readlink, writeFile}from 'node:fs/promises'
 import {dirname, isAbsolute, join, normalize, relative, resolve, sep} from 'node:path'
-import {ModuleFile} from './types'
 
 export const VITE_CLIENT = '/@vite/client'
 export const VITE_FS = '/@fs'
@@ -85,5 +85,13 @@ export const relativePath = (importer: string, importId: string) => {
   const rp = relative(importer, importId).replace(PARENT_DIR, CUR_DIR)
   return rp.startsWith(`${CUR_DIR}${PARENT_DIR}`) ? rp.replace(CUR_DIR, '') : rp
 }
+                         
+export const readJsonSync = (file: string, root: string = '') => {
+  return JSON.parse(
+    readFileSync(isAbsolute(file) ? file : join(root, file), {encoding: 'utf-8'})
+  )
+}
 
-                          
+export const writeJsonSync = (file: string, json: any, root: string = '', ) => {
+  writeFileSync(isAbsolute(file) ? file : join(root, file), JSON.stringify(json))
+}

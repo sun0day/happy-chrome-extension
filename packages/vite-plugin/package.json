@@ -27,7 +27,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/chrome": "^0.0.260",
+    "@types/lodash.merge": "^4.6.9",
     "@types/node": "^20.11.10",
+    "lodash.merge": "^4.6.2",
     "vite": "^5.0.12"
   },
   "dependencies": {

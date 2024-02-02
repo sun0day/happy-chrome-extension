@@ -9,6 +9,8 @@ import {symlink} from 'node:fs/promises'
 import { init as lexerInit , parse as parseESM } from 'es-module-lexer'
 import MagicString from 'magic-string'
 import {ModuleFile, PluginCrxOptions} from './types'
+import './manifest'
+import {Manifest} from './manifest'
 
 const urlMaps = new WeakMap<PluginCrxOptions, Map<string, ModuleFile>>()
 
@@ -18,6 +20,7 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
   let nodeModulesRoot: string = ''
   let nodeModulesShadow: string = ''
   let virtualDir: string = ''
+  let manifest: Manifest
 
 	return <PluginOption>{
 		name: "vite-plugin-happy-crx",
@@ -36,6 +39,7 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
       //nodeModulesShadow = join(outDir, NODE_MODULES)
       //virtualDir = join(outDir, VIRTUAL_DIR)
       urlMaps.set(options, new Map())
+      manifest = new Manifest(root, outDir)
 		},
 
 		async configureServer(server) {
@@ -93,8 +97,9 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
           return str.toString()
         }
 
-        const urlQueue = [VITE_CLIENT, '/src/main.tsx']
+        const urlQueue = [VITE_CLIENT, ...manifest.getEntries()]
 
+        // query and emit all modules to outDir
         while(urlQueue.length)  {
           const url = urlQueue.shift()
           const moduleInfo = await getModuleInfo(url!)
@@ -110,11 +115,15 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
 
           urlMap.set(url!, moduleFile)
           urlQueue.push(...moduleInfo.deps)
+
           emitFile(
             join(outDir, moduleFile.target), 
             await importedUrlToPath(moduleFile.target, moduleInfo.code)
           )
         }
+
+        // emit manifest to outDir
+        manifest.create(urlMap) 
       })
     }
   }

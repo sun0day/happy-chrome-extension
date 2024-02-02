@@ -7,9 +7,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "types": [
-      "vite/client"
+      "vite/client",
+      "chrome"
     ],
-    "strict": true,
+   "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
     "skipDefaultLibCheck": true,

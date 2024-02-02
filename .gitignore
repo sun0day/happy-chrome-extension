@@ -143,3 +143,6 @@ packages/*/index.js
 
 # external git repo
 repos
+
+# temp files
+**/*.swp
