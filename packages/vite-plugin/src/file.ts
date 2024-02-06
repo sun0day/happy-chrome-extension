@@ -1,6 +1,6 @@
 import {readFileSync, writeFileSync} from 'node:fs'
 import {access,constants,mkdir, rm as nativeRm, readlink, writeFile}from 'node:fs/promises'
-import {dirname, isAbsolute, join, normalize, relative, resolve, sep} from 'node:path'
+import {basename, dirname, isAbsolute, join, normalize, relative, resolve, sep} from 'node:path'
 
 export const VITE_CLIENT = '/@vite/client'
 export const VITE_FS = '/@fs'
@@ -79,6 +79,12 @@ export const idToTarget = async (id: string, root: string) => {
   target = target.replace(EXT_REG, (_, ext) => ext)
   
   return target.endsWith(JS_EXT) ? target : `${target}${JS_EXT}`
+}
+
+// target to loader
+export const targetToLoader = (target: string) => {
+  const filename = basename(target)
+  return filename.replace(/([^.]+?)\./, (_, name) => `${name}-loader.`)
 }
 
 export const relativePath = (importer: string, importId: string) => {

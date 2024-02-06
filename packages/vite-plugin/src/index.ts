@@ -1,4 +1,4 @@
-import {normalizePath, type PluginOption} from 'vite'
+import {normalizePath, type PluginOption, type Rollup} from 'vite'
 import { 
   NODE_MODULES,
   SLASH,
@@ -7,10 +7,11 @@ import {
 import {isAbsolute, join, relative, sep} from 'node:path'
 import {symlink} from 'node:fs/promises'
 import { init as lexerInit , parse as parseESM } from 'es-module-lexer'
-import MagicString from 'magic-string'
+import MagicString, {SourceMap} from 'magic-string'
 import {ModuleFile, PluginCrxOptions} from './types'
 import './manifest'
 import {Manifest} from './manifest'
+import {ContentLoader} from './content-loader'
 
 const urlMaps = new WeakMap<PluginCrxOptions, Map<string, ModuleFile>>()
 
@@ -61,7 +62,7 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
             return
           }
 
-          const {code} = res
+          const {code, map}= res
           const moduleNode = await server.moduleGraph.getModuleByUrl(url)
           if(!moduleNode?.id) {
             return
@@ -72,11 +73,11 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
             .map(m => fileToUrl(m.id!, root))
 
          
-          return {id: moduleNode.id, deps, code} 
+          return {id: moduleNode.id, deps, code, map} 
         }
       
         // transform imported urls to crx relative path in code
-        async function importedUrlToPath(importer: string, code: string) {
+        async function importedUrlToPath(importer: string, code: string, map: Rollup.SourceMap | null) {
           const [imports] = parseESM(code)
           const str = new MagicString(code)
 
@@ -91,9 +92,16 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
                 }
                 target = relativePath(importer, target)
                 str.update(s, e, target)
+                
               } catch(err) {}
             })
           )
+
+          if(map?.toString) {
+            str.replace(/\/\/#\s*sourceMappingURL.+\s*/, '')
+            str.append(`\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${Buffer.from(map.toString(), 'utf8').toString('base64')}`)
+          }
+
           return str.toString()
         }
 
@@ -117,13 +125,19 @@ export default (options: PluginCrxOptions = {}): PluginOption => {
           urlQueue.push(...moduleInfo.deps)
 
           emitFile(
-            join(outDir, moduleFile.target), 
-            await importedUrlToPath(moduleFile.target, moduleInfo.code)
+            join(outDir, moduleFile.target),
+            // @ts-expect-error map's type is compatible
+            await importedUrlToPath(moduleFile.target, moduleInfo.code, moduleInfo.map)
           )
         }
 
         // emit manifest to outDir
-        manifest.create(urlMap) 
+        manifest.create(urlMap)
+
+        // emit content loaders
+        manifest.getContentTargets(urlMap).map(target => {
+          return new ContentLoader(outDir, target).emit()
+        })
       })
     }
   }

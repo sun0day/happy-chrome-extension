@@ -1,7 +1,6 @@
-import {readFileSync} from "fs"
 import {join, resolve} from "path"
 import merge from 'lodash.merge'
-import {readJsonSync, writeJsonSync} from "./file"
+import {readJsonSync, targetToLoader, writeJsonSync} from "./file"
 import {ModuleFile} from "./types"
 
 const MANIFEST = 'manifest.json'
@@ -20,7 +19,7 @@ export class Manifest {
 
   // create a real manifest to outDir
   create(urlMap: Map<string, ModuleFile>) {
-    const contentScripts = this.manifest['content_scripts'] ?? []
+    let contentScripts = this.manifest['content_scripts'] ?? []
     const webAccessResources = this.manifest['web_accessible_resources']?.slice() ?? []
 
     // add permission for dev assets emissions
@@ -31,14 +30,19 @@ export class Manifest {
     })))
 
     // replace js entries in content_scripts
-    contentScripts.forEach((script) => {
+    contentScripts = contentScripts.map((script) => {
       if(!script.js) {
-        return 
+        return script 
       }
-      script.js = script.js.map(jsFile => urlMap.get(jsFile)!.target) ?? []
+      
+      return {
+        ...script,
+        js: script.js.map(jsFile => targetToLoader(urlMap.get(jsFile)!.target)) ?? []
+      }
     })
 
     const newManifest =  merge({}, this.manifest, {
+      content_scripts: contentScripts,
       web_accessible_resources: webAccessResources
     })
 
@@ -51,5 +55,19 @@ export class Manifest {
         (jsFiles, {js}) => jsFiles.concat(js ?? []), 
       [] as string[]
       )
+  }
+
+  // get all content script target files
+  getContentTargets(urlMap: Map<string, ModuleFile>) {
+    const contentScripts = this.manifest['content_scripts'] ?? []
+
+    return contentScripts.reduce((targets, script) => {
+      if(!script.js) {
+        return  targets
+      }
+      return targets.concat(
+        script.js.map(jsFile => urlMap.get(jsFile)!.target) ?? []
+      )
+    }, [] as string[])
   }
 }
