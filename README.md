@@ -2,7 +2,7 @@
 
 # [WIP] happy-chrome-extension
 
-This mono repo aims to improve the Chrome extension DX for developers. It provides rich features to help you quickly build a new robust Chrome extension app. You can also pick some of the `happy-chrome-extension` packages to enhance an existing Chrome extension. 
+This mono repo aims to improve the Chrome extension DX for developers(all thoughts came from this [article](https://sun0day.github.io/blog/crx/rethinking-chrome-extension-dx.htm)). It provides rich features to help you quickly build a new robust Chrome extension app. You can also pick some of the `happy-chrome-extension` packages to enhance an existing Chrome extension. 
 
 ## 🚀 Features
 
